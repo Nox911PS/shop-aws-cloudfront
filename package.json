@@ -5,12 +5,16 @@
     "shop-aws-cloudfront": "bin/shop-aws-cloudfront.js"
   },
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w",
+    "build": "tsx build.ts",
+    "predeploy": "npm run build",
+    "deploy": "cdk deploy",
+    "presynth": "npm run build",
+    "synth": "cdk synth",
     "test": "jest",
     "cdk": "cdk"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.161",
     "@types/jest": "^30",
     "@types/node": "^24.10.1",
     "aws-cdk": "2.1117.0",
@@ -19,6 +23,7 @@
     "prettier": "^3.8.3",
     "ts-jest": "^29",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.3"
   },
   "dependencies": {
