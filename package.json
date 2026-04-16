@@ -5,9 +5,9 @@
     "shop-aws-cloudfront": "bin/shop-aws-cloudfront.js"
   },
   "scripts": {
-    "build": "tsx build.ts",
+    "build": "tsx scripts/build.ts",
     "predeploy": "npm run build",
-    "deploy": "cdk deploy",
+    "deploy": "cdk deploy --require-approval never",
     "presynth": "npm run build",
     "synth": "cdk synth",
     "test": "jest",

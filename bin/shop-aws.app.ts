@@ -9,4 +9,5 @@ new AwsStack(app, 'AwsStack', {
     account: process.env.CDK_ACCOUNT || process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_REGION || process.env.CDK_DEFAULT_REGION,
   },
+  allowedOrigin: process.env.ALLOWED_ORIGIN || '*',
 });

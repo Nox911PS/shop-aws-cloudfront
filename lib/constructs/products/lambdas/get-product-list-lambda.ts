@@ -2,9 +2,10 @@ import * as path from 'path';
 import { Construct } from 'constructs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as cdk from 'aws-cdk-lib';
+import { AwsStackProps } from '../../../stacks/aws-stack';
 
 export class GetProductListLambda extends lambda.Function {
-  constructor(scope: Construct, id: string) {
+  constructor(scope: Construct, id: string, allowedOrigin: string) {
     super(scope, id, {
       runtime: lambda.Runtime.NODEJS_24_X,
       code: lambda.Code.fromAsset(path.join(__dirname, '../../../../dist')),
@@ -12,7 +13,7 @@ export class GetProductListLambda extends lambda.Function {
       memorySize: 512,
       timeout: cdk.Duration.seconds(5),
       environment: {
-        ALLOWED_ORIGIN: 'https://cloudfront.net', // 'http://localhost:4200'
+        ALLOWED_ORIGIN: allowedOrigin,
       },
     });
   }
