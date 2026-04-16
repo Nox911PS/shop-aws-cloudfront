@@ -2,7 +2,6 @@ import * as path from 'path';
 import { Construct } from 'constructs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as cdk from 'aws-cdk-lib';
-import { AwsStackProps } from '../../../stacks/aws-stack';
 
 export class GetProductListLambda extends lambda.Function {
   constructor(scope: Construct, id: string, allowedOrigin: string) {
