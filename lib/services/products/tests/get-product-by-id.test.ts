@@ -25,7 +25,7 @@ describe('getProductById', () => {
     } as unknown as APIGatewayProxyEvent;
     const response = await getProductById(mockEvent);
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(404);
     expect(response.body).toBe(
       JSON.stringify({ message: `Product with ID ${productId} not found` }),
     );
