@@ -2,7 +2,7 @@ import { Construct } from 'constructs';
 
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import { CreateProductLambda, GetProductByIdLambda, GetProductListLambda } from './lambdas';
-import { ProductByIdResource, ProductListResource } from './resources';
+import { ProductByIdResource, ProductListResource, CreateProductResource } from './resources';
 import { AwsStackProps } from '../../stacks/aws-stack';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 
@@ -70,7 +70,7 @@ export class ProductsLambdaConstruct extends Construct {
       resource: productsBaseResource,
       handler: getProductByIdLambda,
     });
-    new ProductByIdResource(this, 'CreateProductResource', {
+    new CreateProductResource(this, 'CreateProductResource', {
       resource: productsBaseResource,
       handler: createProductLambda,
     });
