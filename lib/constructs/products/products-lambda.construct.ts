@@ -4,6 +4,7 @@ import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import { GetProductByIdLambda, GetProductListLambda } from './lambdas';
 import { ProductByIdResource, ProductListResource } from './resources';
 import { AwsStackProps } from '../../stacks/aws-stack';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 
 export class ProductsLambdaConstruct extends Construct {
   constructor(scope: Construct, id: string, props: AwsStackProps) {
@@ -19,20 +20,38 @@ export class ProductsLambdaConstruct extends Construct {
       },
     });
 
-    // Products :: Base Resource
-    const productsBaseResource = api.root.addResource('products');
+    // Products :: Database tables
+
+    const productsTable = dynamodb.Table.fromTableName(
+      scope,
+      'ProductsTable',
+      props.productsDatabaseName,
+    );
+    const stocksTable = dynamodb.Table.fromTableName(
+      scope,
+      'StocksTable',
+      props.stocksDatabaseName,
+    );
 
     // Products :: Lambdas
-    const getProductListLambda = new GetProductListLambda(
-      this,
-      'getProductsList',
-      props.allowedOrigin,
-    );
-    const getProductByIdLambda = new GetProductByIdLambda(
-      this,
-      'getProductsById',
-      props.allowedOrigin,
-    );
+    const getProductListLambda = new GetProductListLambda(this, 'getProductsList', {
+      allowedOrigin: props.allowedOrigin,
+      productsDatabaseName: productsTable.tableName,
+      stocksDatabaseName: stocksTable.tableName,
+    });
+    productsTable.grantReadData(getProductListLambda);
+    stocksTable.grantReadData(getProductListLambda);
+
+    const getProductByIdLambda = new GetProductByIdLambda(this, 'getProductsById', {
+      allowedOrigin: props.allowedOrigin,
+      productsDatabaseName: productsTable.tableName,
+      stocksDatabaseName: stocksTable.tableName,
+    });
+    productsTable.grantReadData(getProductByIdLambda);
+    stocksTable.grantReadData(getProductByIdLambda);
+
+    // Products :: Base Resource
+    const productsBaseResource = api.root.addResource('products');
 
     // Products :: Resources
     new ProductListResource(this, 'ProductListResource', {

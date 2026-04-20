@@ -5,6 +5,7 @@
     "shop-aws-cloudfront": "bin/shop-aws-cloudfront.js"
   },
   "scripts": {
+    "fillTables": "tsx scripts/fill-tables.ts",
     "build": "tsx scripts/build.ts",
     "predeploy": "npm run build",
     "deploy": "cdk deploy --require-approval never",
@@ -16,7 +17,8 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.161",
     "@types/jest": "^30",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.12.2",
+    "@types/uuid": "^10.0.0",
     "aws-cdk": "2.1117.0",
     "esbuild": "^0.28.0",
     "jest": "^30",
@@ -27,8 +29,11 @@
     "typescript": "~5.9.3"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1032.0",
+    "@aws-sdk/lib-dynamodb": "^3.1032.0",
     "aws-cdk-lib": "^2.247.0",
     "constructs": "^10.5.0",
-    "dotenv": "^17.4.1"
+    "dotenv": "^17.4.1",
+    "uuid": "^14.0.0"
   }
 }
