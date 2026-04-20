@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, TransactWriteCommand } from '@aws-sdk/lib-dynamodb';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 } from 'uuid';
 import { productsTableMockData } from '../mock/products-table-mock-data';
 
 const region = process.env.CDK_REGION || process.env.CDK_DEFAULT_REGION;
@@ -13,7 +13,7 @@ const docClient = DynamoDBDocumentClient.from(client);
 const fillTablesWithTransaction = async (): Promise<void> => {
   try {
     for (const productTableItem of productsTableMockData) {
-      const id: string = uuidv4();
+      const id: string = v4();
 
       const command = new TransactWriteCommand({
         TransactItems: [

@@ -1,7 +1,7 @@
 import { Construct } from 'constructs';
 
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
-import { GetProductByIdLambda, GetProductListLambda } from './lambdas';
+import { CreateProductLambda, GetProductByIdLambda, GetProductListLambda } from './lambdas';
 import { ProductByIdResource, ProductListResource } from './resources';
 import { AwsStackProps } from '../../stacks/aws-stack';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
@@ -50,6 +50,14 @@ export class ProductsLambdaConstruct extends Construct {
     productsTable.grantReadData(getProductByIdLambda);
     stocksTable.grantReadData(getProductByIdLambda);
 
+    const createProductLambda = new CreateProductLambda(this, 'createProductLambda', {
+      allowedOrigin: props.allowedOrigin,
+      productsDatabaseName: productsTable.tableName,
+      stocksDatabaseName: stocksTable.tableName,
+    });
+    productsTable.grantWriteData(createProductLambda);
+    stocksTable.grantWriteData(createProductLambda);
+
     // Products :: Base Resource
     const productsBaseResource = api.root.addResource('products');
 
@@ -61,6 +69,10 @@ export class ProductsLambdaConstruct extends Construct {
     new ProductByIdResource(this, 'ProductByIdResource', {
       resource: productsBaseResource,
       handler: getProductByIdLambda,
+    });
+    new ProductByIdResource(this, 'CreateProductResource', {
+      resource: productsBaseResource,
+      handler: createProductLambda,
     });
   }
 }

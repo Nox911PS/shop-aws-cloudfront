@@ -4,12 +4,12 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as cdk from 'aws-cdk-lib';
 import { ProductsLambdaProps } from './model';
 
-export class GetProductListLambda extends lambda.Function {
+export class CreateProductLambda extends lambda.Function {
   constructor(scope: Construct, id: string, props: ProductsLambdaProps) {
     super(scope, id, {
       runtime: lambda.Runtime.NODEJS_24_X,
       code: lambda.Code.fromAsset(path.join(__dirname, '../../../../dist')),
-      handler: 'get-product-list.getProductList',
+      handler: 'create-product.createProduct',
       memorySize: 512,
       timeout: cdk.Duration.seconds(5),
       environment: {

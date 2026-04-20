@@ -15,7 +15,7 @@ export class GetProductByIdLambda extends lambda.Function {
       environment: {
         ALLOWED_ORIGIN: props.allowedOrigin,
         PRODUCTS_TABLE_NAME: props.productsDatabaseName,
-        COUNTS_TABLE_NAME: props.productsDatabaseName,
+        STOCKS_TABLE_NAME: props.stocksDatabaseName,
       },
     });
   }
