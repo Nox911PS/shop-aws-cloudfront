@@ -8,6 +8,7 @@ declare global {
       readonly CDK_DEFAULT_REGION: string;
       readonly PRODUCTS_TABLE_NAME: string;
       readonly STOCKS_TABLE_NAME: string;
+      readonly S3_BUCKET_NAME: string;
     }
   }
 }
