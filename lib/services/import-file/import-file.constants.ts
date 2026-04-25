@@ -1,0 +1,1 @@
+export const SIGNED_URL_EXPIRATION_IN_MS = 3600;

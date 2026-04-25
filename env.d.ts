@@ -9,6 +9,7 @@ declare global {
       readonly PRODUCTS_TABLE_NAME: string;
       readonly STOCKS_TABLE_NAME: string;
       readonly S3_BUCKET_NAME: string;
+      readonly S3_BUCKET_UPLOADED_FOLDER: string;
     }
   }
 }

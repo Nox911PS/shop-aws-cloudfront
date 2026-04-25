@@ -1,12 +1,14 @@
 import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cdk from 'aws-cdk-lib';
+import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
 
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import { ImportProductFileLambda } from './lambdas';
 
 import { ImportServiceStackProps } from '../../stacks/import-service-stack';
 import { ImportProductFileResource } from './resources';
+import { ParseProductFileLambda } from './lambdas/parse-product-file-lambda';
 
 export class ImportLambdaConstruct extends Construct {
   constructor(scope: Construct, id: string, props: ImportServiceStackProps) {
@@ -41,7 +43,20 @@ export class ImportLambdaConstruct extends Construct {
       allowedOrigin: props.allowedOrigin,
       s3BucketName: props.s3BucketName,
     });
-    importBucket.grantReadWrite(importProductFileLambda);
+    importBucket.grantRead(importProductFileLambda);
+
+    const parseProductFileLambda = new ParseProductFileLambda(this, 'ParseProductFileLambda', {
+      allowedOrigin: props.allowedOrigin,
+      s3BucketName: props.s3BucketName,
+      s3BucketUploadedFolder: props.s3BucketUploadedFolder,
+    });
+    importBucket.grantReadWrite(parseProductFileLambda);
+    importBucket.grantDelete(parseProductFileLambda);
+    importBucket.addEventNotification(
+      s3.EventType.OBJECT_CREATED,
+      new s3n.LambdaDestination(parseProductFileLambda),
+      { prefix: props.s3BucketUploadedFolder },
+    );
 
     // Import :: Base Resource
     const importBaseResource = api.root.addResource('import');
