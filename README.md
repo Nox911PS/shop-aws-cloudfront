@@ -1,14 +1,51 @@
-# Welcome to your CDK TypeScript project
+## 🚀 Initialization and Setup
 
-This is a blank project for CDK development with TypeScript.
+### 1. Prerequisites
+* Installed **Node.js** (version 20.x or higher).
+* Configured **AWS CLI** with valid credentials.
+* Globally installed AWS CDK: `npm install -g aws-cdk`.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+### 2. Install Dependencies
+```bash
+npm install
+```
 
-## Useful commands
+### 3. Environment Variables Configuration
+* Create a .env file in the root of the project and add the following parameters:
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+```
+env
+CDK_ACCOUNT=0000000000000
+CDK_REGION=us-east-1
+ALLOWED_ORIGINS=http://localhost:4200,https://cloudfront.net
+```
+
+### 4. Build and Deploy
+The project uses a custom build via esbuild to meet the requirement for manual bundler configuration.
+**Manual Code Build:**
+```
+npm run build
+```
+
+### 5. CloudFormation Template Synthesis:
+
+```
+npm run synth
+```
+
+### 6.Deploy to AWS Cloud:
+```
+npm run deploy
+```
+The deploy script automatically triggers the build (predeploy), so the code in AWS is always up to date.
+
+### 7. API Documentation (Swagger)
+The API specification is available in the file: swagger.yaml
+You can import this file into Swagger Editor to visualize and test the requests.
+
+
+### 8. Resource Links
+
+Frontend (Angular App): https://dqf8vlilpkdl9.cloudfront.net/
+
+Backend API (API Gateway URL): https://54qzly9jwb.execute-api.eu-north-1.amazonaws.com/prod
