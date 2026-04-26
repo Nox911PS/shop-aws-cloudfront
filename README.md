@@ -1,51 +1,67 @@
-## 🚀 Initialization and Setup
+## Initialization and Setup
 
 ### 1. Prerequisites
-* Installed **Node.js** (version 20.x or higher).
-* Configured **AWS CLI** with valid credentials.
-* Globally installed AWS CDK: `npm install -g aws-cdk`.
+- Install **Node.js** (20.x or higher).
+- Configure **AWS CLI** with valid credentials.
+- Install AWS CDK globally:
+
+```bash
+npm install -g aws-cdk
+```
 
 ### 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
-### 3. Environment Variables Configuration
-* Create a .env file in the root of the project and add the following parameters:
+### 3. Environment Variables
+Create a `.env` file in the project root:
 
-```
-env
-CDK_ACCOUNT=0000000000000
-CDK_REGION=us-east-1
-ALLOWED_ORIGINS=http://localhost:4200,https://cloudfront.net
+```env
+CDK_ACCOUNT=000000000000
+CDK_REGION=eu-north-1
+ALLOWED_ORIGIN=https://your-cloudfront-domain
+PRODUCTS_TABLE_NAME=Products
+STOCKS_TABLE_NAME=Stocks
 ```
 
-### 4. Build and Deploy
-The project uses a custom build via esbuild to meet the requirement for manual bundler configuration.
-**Manual Code Build:**
-```
+Notes:
+- `ALLOWED_ORIGIN` (singular) is used by Lambdas and CDK stack configuration.
+- `CDK_DEFAULT_ACCOUNT` and `CDK_DEFAULT_REGION` can be provided by the AWS/CDK environment and are used as fallback values.
+
+### 4. Build
+
+```bash
 npm run build
 ```
 
-### 5. CloudFormation Template Synthesis:
+### 5. Synthesize CloudFormation Template
 
-```
+```bash
 npm run synth
 ```
 
-### 6.Deploy to AWS Cloud:
-```
+### 6. Deploy
+
+```bash
 npm run deploy
 ```
-The deploy script automatically triggers the build (predeploy), so the code in AWS is always up to date.
 
-### 7. API Documentation (Swagger)
-The API specification is available in the file: swagger.yaml
-You can import this file into Swagger Editor to visualize and test the requests.
+`deploy` automatically runs `build` first (`predeploy`).
 
+### 7. Useful Scripts
 
-### 8. Resource Links
+```bash
+npm test
+npm run fillTables
+```
 
-Frontend (Angular App): https://dqf8vlilpkdl9.cloudfront.net/
+### 8. API Documentation
+OpenAPI spec: `swagger.yaml`
 
-Backend API (API Gateway URL): https://54qzly9jwb.execute-api.eu-north-1.amazonaws.com/prod
+You can import it into Swagger Editor to browse and test endpoints.
+
+### 9. Resource Links
+- Frontend (Angular App): https://dqf8vlilpkdl9.cloudfront.net/
+- Backend API (API Gateway URL): https://54qzly9jwb.execute-api.eu-north-1.amazonaws.com/prod

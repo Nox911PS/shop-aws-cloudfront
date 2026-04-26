@@ -4,6 +4,8 @@ import { ProductsLambdaConstruct } from '../constructs';
 
 export interface AwsStackProps extends cdk.StackProps {
   readonly allowedOrigin: string;
+  readonly productsDatabaseName: string;
+  readonly stocksDatabaseName: string;
 }
 
 export class AwsStack extends cdk.Stack {

@@ -10,4 +10,6 @@ new AwsStack(app, 'AwsStack', {
     region: process.env.CDK_REGION || process.env.CDK_DEFAULT_REGION,
   },
   allowedOrigin: process.env.ALLOWED_ORIGIN || '*',
+  productsDatabaseName: process.env.PRODUCTS_TABLE_NAME!,
+  stocksDatabaseName: process.env.STOCKS_TABLE_NAME!,
 });
