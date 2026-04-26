@@ -5,8 +5,8 @@ import {
   CopyObjectCommand,
   DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
-import csvParser = require('csv-parser');
-import { Readable } from 'stream';
+import { parse } from 'csv-parse';
+import type { Readable } from 'node:stream';
 import { IImportProduct } from './import-product.model';
 
 export const parseProductFile = async (event: S3Event): Promise<void> => {
@@ -30,7 +30,7 @@ export const parseProductFile = async (event: S3Event): Promise<void> => {
 
       await new Promise<void>((resolve, reject) => {
         s3Stream
-          .pipe(csvParser())
+          .pipe(parse({ columns: true, skip_empty_lines: true, trim: true }))
           .on('data', (data: IImportProduct) => {
             console.log('Parsed record:', data);
           })

@@ -1,19 +1,24 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
-import {
-  mockGetSignedUrl,
-  mockPutObjectCommand,
-  mockS3Client,
-} from '../../../../mock/jest.mock';
+import { mockClient } from 'aws-sdk-client-mock';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+
+jest.mock('@aws-sdk/s3-request-presigner', () => ({
+  getSignedUrl: jest.fn(),
+}));
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 import { SIGNED_URL_EXPIRATION_IN_MS } from '../import-file.constants';
 import { importProductFile } from '../import-product-file';
+
+const s3Mock = mockClient(S3Client);
+const mockGetSignedUrl = getSignedUrl as jest.MockedFunction<typeof getSignedUrl>;
 
 describe('importProductFile', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
+    s3Mock.reset();
     jest.clearAllMocks();
-    mockS3Client.mockImplementation((config) => ({ config }));
     process.env = {
       ...originalEnv,
       CDK_REGION: 'eu-north-1',
@@ -36,9 +41,8 @@ describe('importProductFile', () => {
 
     expect(response.statusCode).toBe(400);
     expect(response.body).toBe(JSON.stringify({ message: 'File name query param is required' }));
-    expect(mockS3Client).not.toHaveBeenCalled();
-    expect(mockPutObjectCommand).not.toHaveBeenCalled();
     expect(mockGetSignedUrl).not.toHaveBeenCalled();
+    expect(s3Mock.calls()).toHaveLength(0);
   });
 
   it('should return signed url for valid file name', async () => {
@@ -59,22 +63,17 @@ describe('importProductFile', () => {
     });
     expect(response.body).toBe(JSON.stringify(signedUrl));
 
-    expect(mockS3Client).toHaveBeenCalledWith({ region: 'eu-north-1' });
-    expect(mockPutObjectCommand).toHaveBeenCalledWith({
+    expect(mockGetSignedUrl).toHaveBeenCalledTimes(1);
+    const [clientArg, commandArg, optionsArg] = mockGetSignedUrl.mock.calls[0];
+
+    expect(clientArg).toBeInstanceOf(S3Client);
+    expect(commandArg).toBeInstanceOf(PutObjectCommand);
+    expect((commandArg as PutObjectCommand).input).toEqual({
       Bucket: 'import-products-bucket',
       Key: 'uploaded/products.csv',
     });
-    expect(mockGetSignedUrl).toHaveBeenCalledTimes(1);
-    expect(mockGetSignedUrl).toHaveBeenCalledWith(
-      { config: { region: 'eu-north-1' } },
-      {
-        input: {
-          Bucket: 'import-products-bucket',
-          Key: 'uploaded/products.csv',
-        },
-      },
-      { expiresIn: SIGNED_URL_EXPIRATION_IN_MS },
-    );
+    expect(optionsArg).toEqual({ expiresIn: SIGNED_URL_EXPIRATION_IN_MS });
+    expect(s3Mock.calls()).toHaveLength(0);
   });
 
   it('should return 500 when signed url generation fails', async () => {

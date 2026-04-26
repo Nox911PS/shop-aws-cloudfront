@@ -41,13 +41,14 @@ export class ImportLambdaConstruct extends Construct {
     // Import :: Lambdas
     const importProductFileLambda = new ImportProductFileLambda(this, 'ImportProductFileLambda', {
       allowedOrigin: props.allowedOrigin,
-      s3BucketName: props.s3BucketName,
+      s3BucketName: importBucket.bucketName,
+      s3BucketUploadedFolder: props.s3BucketUploadedFolder,
     });
-    importBucket.grantRead(importProductFileLambda);
+    importBucket.grantReadWrite(importProductFileLambda);
 
     const parseProductFileLambda = new ParseProductFileLambda(this, 'ParseProductFileLambda', {
       allowedOrigin: props.allowedOrigin,
-      s3BucketName: props.s3BucketName,
+      s3BucketName: importBucket.bucketName,
       s3BucketUploadedFolder: props.s3BucketUploadedFolder,
     });
     importBucket.grantReadWrite(parseProductFileLambda);

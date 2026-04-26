@@ -12,6 +12,6 @@ export class ProductServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ProductServiceStackProps) {
     super(scope, id, props);
 
-    new ProductsLambdaConstruct(this, 'ImportLambdaConstruct', props);
+    new ProductsLambdaConstruct(this, 'ProductLambdaConstruct', props);
   }
 }

@@ -1,12 +1,17 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
-import { mockSend } from '../../../../mock/jest.mock';
+import { mockClient } from 'aws-sdk-client-mock';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 
 import { getProductList } from '../get-product-list';
+
+const dynamoMock = mockClient(DynamoDBClient);
 
 describe('getProductsList', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
+    dynamoMock.reset();
     jest.clearAllMocks();
     process.env = {
       ...originalEnv,
@@ -45,9 +50,11 @@ describe('getProductsList', () => {
       { product_id: 'product-2', count: 0 },
     ];
 
-    mockSend
-      .mockResolvedValueOnce({ Items: products })
-      .mockResolvedValueOnce({ Items: stocks });
+    dynamoMock
+      .on(ScanCommand, { TableName: 'products-table' })
+      .resolvesOnce({ Items: products } as never)
+      .on(ScanCommand, { TableName: 'stocks-table' })
+      .resolvesOnce({ Items: stocks } as never);
 
     const mockEvent = {} as APIGatewayProxyEvent;
     const response = await getProductList(mockEvent);
@@ -63,11 +70,11 @@ describe('getProductsList', () => {
       { ...products[0], count: 3 },
       { ...products[1], count: 0 },
     ]);
-    expect(mockSend).toHaveBeenCalledTimes(2);
-    expect(mockSend.mock.calls[0][0].input).toEqual({
+    expect(dynamoMock.commandCalls(ScanCommand)).toHaveLength(2);
+    expect(dynamoMock.commandCalls(ScanCommand)[0].args[0].input).toEqual({
       TableName: 'products-table',
     });
-    expect(mockSend.mock.calls[1][0].input).toEqual({
+    expect(dynamoMock.commandCalls(ScanCommand)[1].args[0].input).toEqual({
       TableName: 'stocks-table',
     });
   });
@@ -87,6 +94,6 @@ describe('getProductsList', () => {
         error: 'Table names are not defined in environment variables',
       }),
     );
-    expect(mockSend).not.toHaveBeenCalled();
+    expect(dynamoMock.calls()).toHaveLength(0);
   });
 });

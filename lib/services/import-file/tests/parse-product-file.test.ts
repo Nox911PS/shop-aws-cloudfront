@@ -1,21 +1,23 @@
 import { S3Event } from 'aws-lambda';
 import { Readable } from 'stream';
+import { mockClient } from 'aws-sdk-client-mock';
 import {
-  mockS3Client,
-  mockS3Send,
-  mockGetObjectCommand,
-  mockCopyObjectCommand,
-  mockDeleteObjectCommand,
-} from '../../../../mock/jest.mock';
+  S3Client,
+  GetObjectCommand,
+  CopyObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
 
 import { parseProductFile } from '../parse-product-file';
+
+const s3Mock = mockClient(S3Client);
 
 describe('parseProductFile', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
+    s3Mock.reset();
     jest.clearAllMocks();
-    mockS3Client.mockImplementation(() => ({ send: mockS3Send }));
     process.env = {
       ...originalEnv,
       CDK_REGION: 'eu-north-1',
@@ -33,10 +35,14 @@ describe('parseProductFile', () => {
       'Book,Great book,10,3\n',
     ]);
 
-    mockS3Send
-      .mockResolvedValueOnce({ Body: body })
-      .mockResolvedValueOnce({})
-      .mockResolvedValueOnce({});
+    s3Mock
+      .on(GetObjectCommand, {
+        Bucket: 'test-bucket',
+        Key: 'uploaded/products file.csv',
+      })
+      .resolves({ Body: body } as never);
+    s3Mock.on(CopyObjectCommand).resolves({} as never);
+    s3Mock.on(DeleteObjectCommand).resolves({} as never);
 
     const event = {
       Records: [
@@ -51,46 +57,23 @@ describe('parseProductFile', () => {
 
     await parseProductFile(event);
 
-    expect(mockS3Client).toHaveBeenCalledWith({ region: 'eu-north-1' });
-
-    expect(mockGetObjectCommand).toHaveBeenCalledWith({
+    expect(s3Mock.commandCalls(GetObjectCommand)).toHaveLength(1);
+    expect(s3Mock.commandCalls(GetObjectCommand)[0].args[0].input).toEqual({
       Bucket: 'test-bucket',
       Key: 'uploaded/products file.csv',
     });
 
-    expect(mockCopyObjectCommand).toHaveBeenCalledWith({
+    expect(s3Mock.commandCalls(CopyObjectCommand)).toHaveLength(1);
+    expect(s3Mock.commandCalls(CopyObjectCommand)[0].args[0].input).toEqual({
       Bucket: 'test-bucket',
       CopySource: 'test-bucket/uploaded/products file.csv',
       Key: 'parsed/products file.csv',
     });
 
-    expect(mockDeleteObjectCommand).toHaveBeenCalledWith({
+    expect(s3Mock.commandCalls(DeleteObjectCommand)).toHaveLength(1);
+    expect(s3Mock.commandCalls(DeleteObjectCommand)[0].args[0].input).toEqual({
       Bucket: 'test-bucket',
       Key: 'uploaded/products file.csv',
-    });
-
-    expect(mockS3Send).toHaveBeenCalledTimes(3);
-    expect(mockS3Send).toHaveBeenNthCalledWith(1, {
-      type: 'GetObjectCommand',
-      input: {
-        Bucket: 'test-bucket',
-        Key: 'uploaded/products file.csv',
-      },
-    });
-    expect(mockS3Send).toHaveBeenNthCalledWith(2, {
-      type: 'CopyObjectCommand',
-      input: {
-        Bucket: 'test-bucket',
-        CopySource: 'test-bucket/uploaded/products file.csv',
-        Key: 'parsed/products file.csv',
-      },
-    });
-    expect(mockS3Send).toHaveBeenNthCalledWith(3, {
-      type: 'DeleteObjectCommand',
-      input: {
-        Bucket: 'test-bucket',
-        Key: 'uploaded/products file.csv',
-      },
     });
   });
 
@@ -100,11 +83,11 @@ describe('parseProductFile', () => {
       'Phone,Smart phone,999,5\n',
     ]);
 
-    mockS3Send
-      .mockRejectedValueOnce(new Error('Cannot read object'))
-      .mockResolvedValueOnce({ Body: body })
-      .mockResolvedValueOnce({})
-      .mockResolvedValueOnce({});
+    s3Mock.on(GetObjectCommand).rejectsOnce(new Error('Cannot read object')).resolvesOnce({
+      Body: body,
+    } as never);
+    s3Mock.on(CopyObjectCommand).resolves({} as never);
+    s3Mock.on(DeleteObjectCommand).resolves({} as never);
 
     const event = {
       Records: [
@@ -125,9 +108,9 @@ describe('parseProductFile', () => {
 
     await expect(parseProductFile(event)).resolves.toBeUndefined();
 
-    expect(mockGetObjectCommand).toHaveBeenCalledTimes(2);
-    expect(mockCopyObjectCommand).toHaveBeenCalledTimes(1);
-    expect(mockDeleteObjectCommand).toHaveBeenCalledTimes(1);
+    expect(s3Mock.commandCalls(GetObjectCommand)).toHaveLength(2);
+    expect(s3Mock.commandCalls(CopyObjectCommand)).toHaveLength(1);
+    expect(s3Mock.commandCalls(DeleteObjectCommand)).toHaveLength(1);
   });
 });
 

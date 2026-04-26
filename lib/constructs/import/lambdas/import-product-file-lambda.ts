@@ -15,6 +15,7 @@ export class ImportProductFileLambda extends lambda.Function {
       environment: {
         ALLOWED_ORIGIN: props.allowedOrigin,
         S3_BUCKET_NAME: props.s3BucketName,
+        S3_BUCKET_UPLOADED_FOLDER: props.s3BucketUploadedFolder,
       },
     });
   }
