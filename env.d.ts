@@ -10,6 +10,8 @@ declare global {
       readonly STOCKS_TABLE_NAME: string;
       readonly S3_BUCKET_NAME: string;
       readonly S3_BUCKET_UPLOADED_FOLDER: string;
+      readonly CATALOG_ITEMS_QUEUE_URL?: string;
+      readonly NOTIFICATION_USER_EMAIL: string;
     }
   }
 }
