@@ -1,12 +1,23 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
-import { mockSend, mockUuid } from '../../../../mock/jest.mock';
+import { mockClient } from 'aws-sdk-client-mock';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { TransactWriteCommand } from '@aws-sdk/lib-dynamodb';
+
+const mockUuid = jest.fn();
+
+jest.mock('uuid', () => ({
+  v4: mockUuid,
+}));
 
 import { createProduct } from '../create-product';
+
+const dynamoMock = mockClient(DynamoDBClient);
 
 describe('createProduct', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
+    dynamoMock.reset();
     jest.clearAllMocks();
     process.env = {
       ...originalEnv,
@@ -35,7 +46,7 @@ describe('createProduct', () => {
     };
 
     mockUuid.mockReturnValue(id);
-    mockSend.mockResolvedValueOnce({});
+    dynamoMock.on(TransactWriteCommand).resolves({} as never);
 
     const mockEvent = {
       body: JSON.stringify(product),
@@ -54,8 +65,8 @@ describe('createProduct', () => {
       ...product,
     });
     expect(mockUuid).toHaveBeenCalledTimes(1);
-    expect(mockSend).toHaveBeenCalledTimes(1);
-    expect(mockSend.mock.calls[0][0].input).toEqual({
+    expect(dynamoMock.commandCalls(TransactWriteCommand)).toHaveLength(1);
+    expect(dynamoMock.commandCalls(TransactWriteCommand)[0].args[0].input).toEqual({
       TransactItems: [
         {
           Put: {
@@ -99,7 +110,7 @@ describe('createProduct', () => {
       }),
     );
     expect(mockUuid).not.toHaveBeenCalled();
-    expect(mockSend).not.toHaveBeenCalled();
+    expect(dynamoMock.calls()).toHaveLength(0);
   });
 
   it('should return internal server error when database write fails', async () => {
@@ -112,7 +123,7 @@ describe('createProduct', () => {
     };
 
     mockUuid.mockReturnValue(id);
-    mockSend.mockRejectedValueOnce(new Error('Transaction failed'));
+    dynamoMock.on(TransactWriteCommand).rejects(new Error('Transaction failed'));
 
     const mockEvent = {
       body: JSON.stringify(product),
@@ -128,7 +139,7 @@ describe('createProduct', () => {
       }),
     );
     expect(mockUuid).toHaveBeenCalledTimes(1);
-    expect(mockSend).toHaveBeenCalledTimes(1);
+    expect(dynamoMock.commandCalls(TransactWriteCommand)).toHaveLength(1);
   });
 });
 

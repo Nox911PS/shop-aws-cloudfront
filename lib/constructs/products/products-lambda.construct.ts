@@ -3,11 +3,11 @@ import { Construct } from 'constructs';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import { CreateProductLambda, GetProductByIdLambda, GetProductListLambda } from './lambdas';
 import { ProductByIdResource, ProductListResource, CreateProductResource } from './resources';
-import { AwsStackProps } from '../../stacks/aws-stack';
+import { ProductServiceStackProps } from '../../stacks/product-service-stack';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 
 export class ProductsLambdaConstruct extends Construct {
-  constructor(scope: Construct, id: string, props: AwsStackProps) {
+  constructor(scope: Construct, id: string, props: ProductServiceStackProps) {
     super(scope, id);
 
     const api = new apigateway.RestApi(this, 'Product API Gateway', {
