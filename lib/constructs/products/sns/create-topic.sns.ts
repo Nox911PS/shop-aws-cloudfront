@@ -4,6 +4,7 @@ import { Construct } from 'constructs';
 
 export interface NotificationConstructProps {
   readonly notificationUserEmail: string;
+  readonly notificationUserEmailPremium: string;
 }
 
 export class CreateProductTopicConstruct extends Construct {
@@ -17,5 +18,12 @@ export class CreateProductTopicConstruct extends Construct {
     });
 
     this.topic.addSubscription(new subscriptions.EmailSubscription(props.notificationUserEmail));
+    this.topic.addSubscription(
+      new subscriptions.EmailSubscription(props.notificationUserEmailPremium, {
+        filterPolicy: {
+          price: sns.SubscriptionFilter.numericFilter({ greaterThan: 100 }),
+        },
+      }),
+    );
   }
 }

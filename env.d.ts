@@ -13,6 +13,7 @@ declare global {
       readonly CATALOG_ITEMS_QUEUE_URL?: string;
       readonly CREATE_PRODUCT_TOPIC_ARN?: string;
       readonly NOTIFICATION_USER_EMAIL: string;
+      readonly NOTIFICATION_USER_EMAIL_PREMIUM: string;
     }
   }
 }

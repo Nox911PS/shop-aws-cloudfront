@@ -50,6 +50,8 @@ export const catalogBatchProcess = async (event: SQSEvent) => {
 
   if (processedProducts.length > 0) {
     try {
+      const maxPrice = Math.max(...processedProducts.map((p) => p.price));
+
       await snsClient.send(
         new PublishCommand({
           TopicArn: process.env.CREATE_PRODUCT_TOPIC_ARN,
@@ -59,6 +61,12 @@ export const catalogBatchProcess = async (event: SQSEvent) => {
             null,
             2,
           )}`,
+          MessageAttributes: {
+            price: {
+              DataType: 'Number',
+              StringValue: maxPrice.toString(),
+            },
+          },
         }),
       );
       console.log('SNS Notification sent');

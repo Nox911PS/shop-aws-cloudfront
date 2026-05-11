@@ -34,6 +34,7 @@ export class ProductsLambdaConstruct extends Construct {
       'CreateProductTopicConstruct',
       {
         notificationUserEmail: props.notificationUserEmail,
+        notificationUserEmailPremium: props.notificationUserEmailPremium,
       },
     );
 

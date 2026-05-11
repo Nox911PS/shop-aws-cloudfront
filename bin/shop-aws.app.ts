@@ -13,6 +13,7 @@ const productServiceStack = new ProductServiceStack(app, 'ProductServiceStack', 
   productsDatabaseName: process.env.PRODUCTS_TABLE_NAME!,
   stocksDatabaseName: process.env.STOCKS_TABLE_NAME!,
   notificationUserEmail: process.env.NOTIFICATION_USER_EMAIL!,
+  notificationUserEmailPremium: process.env.NOTIFICATION_USER_EMAIL_PREMIUM!,
 });
 
 new ImportServiceStack(app, 'ImportServiceStack', {

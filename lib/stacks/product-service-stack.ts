@@ -8,6 +8,7 @@ export interface ProductServiceStackProps extends cdk.StackProps {
   readonly productsDatabaseName: string;
   readonly stocksDatabaseName: string;
   readonly notificationUserEmail: string;
+  readonly notificationUserEmailPremium: string;
 }
 
 export class ProductServiceStack extends cdk.Stack {
