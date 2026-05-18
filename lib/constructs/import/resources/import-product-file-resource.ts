@@ -6,6 +6,10 @@ export class ImportProductFileResource extends Construct {
   constructor(scope: Construct, id: string, props: ImportProductFileResourceProps) {
     super(scope, id);
 
-    props.resource.addMethod('GET', new apigateway.LambdaIntegration(props.handler));
+    const methodOptions: apigateway.MethodOptions = {
+      authorizer: props.authorizer,
+    };
+
+    props.resource.addMethod('GET', new apigateway.LambdaIntegration(props.handler), methodOptions);
   }
 }
