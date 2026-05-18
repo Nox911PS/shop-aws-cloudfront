@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib/core';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 import { ImportLambdaConstruct } from '../constructs/import/import-lambda.construct';
@@ -27,8 +28,14 @@ export class ImportServiceStack extends cdk.Stack {
       },
     });
 
+    const apiGatewayAuthorizerInvokeRole = new iam.Role(this, 'ApiGatewayAuthorizerInvokeRole', {
+      assumedBy: new iam.ServicePrincipal('apigateway.amazonaws.com'),
+    });
+    props.basicAuthorizerLambda.grantInvoke(apiGatewayAuthorizerInvokeRole);
+
     const basicAuthorizer = new apigateway.TokenAuthorizer(this, 'BasicAuthorizer', {
       handler: props.basicAuthorizerLambda,
+      assumeRole: apiGatewayAuthorizerInvokeRole,
       identitySource: 'method.request.header.Authorization',
       authorizerName: 'BasicAuthorizer',
       resultsCacheTtl: cdk.Duration.minutes(0),
