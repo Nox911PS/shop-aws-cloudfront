@@ -13,12 +13,10 @@ export class AuthorizationConstruct extends Construct {
   constructor(scope: Construct, id: string, props: AuthorizationConstructProps) {
     super(scope, id);
 
-    // Create the basic authorizer Lambda
     const authorizerLambda = new BasicAuthorizerLambda(this, 'BasicAuthorizerLambda', {
       authorizationCredentials: props.authorizationCredentials,
     });
 
-    // Create the API Gateway Token Authorizer
     this.basicAuthorizer = new apigateway.TokenAuthorizer(this, 'BasicAuthorizer', {
       handler: authorizerLambda,
       identitySource: 'method.request.header.Authorization',
@@ -27,4 +25,3 @@ export class AuthorizationConstruct extends Construct {
     });
   }
 }
-
