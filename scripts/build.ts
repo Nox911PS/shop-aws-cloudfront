@@ -9,6 +9,7 @@ async function runBuild(): Promise<void> {
     entryPoints: [
       join(__dirname, '../lib/services/products/*.ts'),
       join(__dirname, '../lib/services/import-file/*.ts'),
+      join(__dirname, '../lib/services/authorization/*.ts'),
     ],
     bundle: true,
     minify: true,

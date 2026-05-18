@@ -6,23 +6,22 @@ import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import { ImportProductFileLambda } from './lambdas';
 
-import { ImportServiceStackProps } from '../../stacks/import-service-stack';
 import { ImportProductFileResource } from './resources';
 import { ParseProductFileLambda } from './lambdas/parse-product-file-lambda';
+import { IQueue } from 'aws-cdk-lib/aws-sqs';
+
+export interface ImportLambdaConstructProps {
+  readonly allowedOrigin: string;
+  readonly s3BucketName: string;
+  readonly s3BucketUploadedFolder: string;
+  readonly catalogItemsQueue: IQueue;
+  readonly importApi: apigateway.IRestApi;
+  readonly basicAuthorizer: apigateway.IAuthorizer;
+}
 
 export class ImportLambdaConstruct extends Construct {
-  constructor(scope: Construct, id: string, props: ImportServiceStackProps) {
+  constructor(scope: Construct, id: string, props: ImportLambdaConstructProps) {
     super(scope, id);
-
-    const api = new apigateway.RestApi(this, 'Import API Gateway', {
-      restApiName: 'Import API Gateway',
-      description: 'This Import API Gateway serves the Lambda functions.',
-      defaultCorsPreflightOptions: {
-        allowOrigins: [props.allowedOrigin],
-        allowMethods: apigateway.Cors.ALL_METHODS,
-        allowHeaders: ['Content-Type', 'Authorization'],
-      },
-    });
 
     // Import :: Bucket
     const importBucket = new s3.Bucket(this, props.s3BucketName, {
@@ -62,12 +61,13 @@ export class ImportLambdaConstruct extends Construct {
     );
 
     // Import :: Base Resource
-    const importBaseResource = api.root.addResource('import');
+    const importBaseResource = props.importApi.root.addResource('import');
 
     // Import :: Resources
     new ImportProductFileResource(this, 'ImportProductFileResource', {
       resource: importBaseResource,
       handler: importProductFileLambda,
+      authorizer: props.basicAuthorizer,
     });
   }
 }

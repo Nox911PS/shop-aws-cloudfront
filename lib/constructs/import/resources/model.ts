@@ -4,4 +4,5 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 export interface ImportProductFileResourceProps {
   resource: apigateway.IResource;
   handler: lambda.IFunction;
+  authorizer?: apigateway.IAuthorizer;
 }
