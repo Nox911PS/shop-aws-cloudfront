@@ -50,7 +50,9 @@ export class ImportLambdaConstruct extends Construct {
       allowedOrigin: props.allowedOrigin,
       s3BucketName: importBucket.bucketName,
       s3BucketUploadedFolder: props.s3BucketUploadedFolder,
+      catalog_items_queue_url: props.catalogItemsQueue.queueUrl,
     });
+    props.catalogItemsQueue.grantSendMessages(parseProductFileLambda);
     importBucket.grantReadWrite(parseProductFileLambda);
     importBucket.grantDelete(parseProductFileLambda);
     importBucket.addEventNotification(

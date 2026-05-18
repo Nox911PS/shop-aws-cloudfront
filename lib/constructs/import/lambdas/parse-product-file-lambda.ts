@@ -16,6 +16,7 @@ export class ParseProductFileLambda extends lambda.Function {
         ALLOWED_ORIGIN: props.allowedOrigin,
         S3_BUCKET_NAME: props.s3BucketName,
         S3_BUCKET_UPLOADED_FOLDER: props.s3BucketUploadedFolder,
+        CATALOG_ITEMS_QUEUE_URL: props.catalog_items_queue_url,
       },
     });
   }

@@ -8,4 +8,5 @@ export interface ParseProductFileLambdaProps {
   readonly allowedOrigin: string;
   readonly s3BucketName: string;
   readonly s3BucketUploadedFolder: string;
+  readonly catalog_items_queue_url: string;
 }
